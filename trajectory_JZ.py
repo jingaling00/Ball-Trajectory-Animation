@@ -28,47 +28,69 @@ import math
 
 G = 9.8 # gravity
 
-# User inputs
-radius = 15 # int(input('Enter Radius (a number between 10 and 20 inclusive): '))
-initial_speed = 80 #input('Enter initial speed (a number between 30 and 80 inclusive): ')
-initial_angle = 90 #input('Enter a number for initial trajectory angle in degrees (30-90 inclusive)": ')
-initial_angle = initial_angle * math.pi / 180
-time_incr = 0.3 #input('Enter a value for the simulation time increment: ')
+def trajectory(v0, theta, radius, time_incr):
+    # Convert degrees to radians
+    theta = theta * math.pi / 180
+    # Set window size
+    y_traj = ((v0**2)/(2*G)) * ((math.sin(theta))**2) # height of ball
+    max_y = math.floor(y_traj + (3*radius)) # window height
+    x_traj = ((v0**2)/G) * (math.sin(2*theta)) # horizontal displacement of ball
+    max_x = math.floor(2 * (x_traj + (3*radius))) # window size x-axis
+    # Create graphics window
+    win = GraphWin('Trajectory',max_x,max_y)
+    center_point = Point(15,max_y-15)
+    # Define Circle
+    circle = Circle(center_point, radius)
+    # Set colors
+    circle.setFill('yellow')
+    # Draw circle
+    circle.draw(win)
+    # time
+    time_of_flight = (2*v0/G) * math.sin(theta)
+    num_steps = math.ceil(time_of_flight / time_incr)
+    # Ball movement based on velocity vectors
+    dx = (v0 * math.cos(theta)) * time_incr
+    t = 0 # initial time
+    while (circle.getCenter().getX() + radius) < max_x:
+        dy = ((v0 * math.sin(theta)) - (G*(t))) * time_incr
+        dx = (v0 * math.cos(theta)) * time_incr
+        if (circle.getCenter().getY() + radius) > (max_y-1) and t > 0:
+            v0*=0.54
+            t = 0
+            continue
+        elif math.isclose(dy,0,abs_tol=0.1):
+            break
+        else:
+            circle.move(dx,-dy)
+            t += time_incr
+            time.sleep(0.3)
+    print('done')
+        
+if __name__ == '__main__':
+    # User input for radius
+    radius = int(input('Enter Radius (a number between 10 and 20 inclusive): '))
+    radius_error = 0
+    if radius > 20 or radius < 10:
+        print('\nError. Please enter radius between 10 and 20, inclusive.')
+        radius = int(input('Enter Radius (a number between 10 and 20 inclusive): '))
+        
+    # User input for initial speed
+    v0 = int(input('Enter initial speed (a number between 30 and 80 inclusive): '))
+    if v0 > 80 or v0 < 30:
+        print(f'\nError. Please enter initial speed between 30 and 80, inclusive.')
+        v0 = int(input('Enter initial speed (a number between 30 and 80 inclusive): '))
     
-height = ((initial_speed**2)/(2*G)) * ((math.sin(initial_angle))**2) # height of ball
-max_height = math.floor(height + (3*radius)) # window height
-window_range = ((initial_speed**2)/G) * (math.sin(2*initial_angle)) # horizontal displacement of ball
-max_range = math.floor(2 * (window_range + (3*radius))) # window size x-axis
-
-# Create graphics window
-win = GraphWin('Trajectory',max_range,max_height)
-center_point = Point(15,max_height-15)
-
-# Define Circle
-circle = Circle(central_point, radius)
-# Set colors
-circle.setFill('yellow')
-# Draw circle
-circle.draw(win)
-
-time_of_flight = (2*initial_speed/G) * math.sin(initial_angle)
-num_steps = math.ceil(time_of_flight / time_incr)
-
-dx = (initial_speed * math.cos(initial_angle)) * time_incr
-
-t = 0
-
-while (circle.getCenter().getX() + radius < (max_range)):
-    dy = ((initial_speed * math.sin(initial_angle)) - (G*(t))) * time_incr
-    dx = (initial_speed * math.cos(initial_angle)) * time_incr
-    circle.move(dx,-dy)  
-    t += time_incr
-    time.sleep(time_incr)
-    if (circle.getCenter().getY() + radius) >= (max_height):
-        initial_speed*=0.54
-        t = 0
-        continue
-
+    # User input for initial angle
+    theta = int(input('Enter initial trajectory angle in degrees (30-90 inclusive): '))
+    if theta > 90 or theta < 30:
+        print(f'\nError. Please enter initial angle between 30 and 90 degrees, inclusive.')
+        theta = int(input('Enter initial trajectory angle in degrees (30-90 inclusive)": '))
+    
+    # User input for time increment
+    time_incr = float(input('Enter a value for the simulation time increment: '))
+    
+    # Run trajectory of ball
+    trajectory(v0,theta,radius,time_incr)
 
 """ DO NOT MODIFY OR WRITE ANYTHING BELOW """
 
