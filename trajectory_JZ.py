@@ -19,7 +19,6 @@ Template code
 
 
 """
-
 from graphics import *
 import time
 import math
